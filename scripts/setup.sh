@@ -1,6 +1,7 @@
 # Install the ultralytics package from PyPI
 pip install ultralytics
 pip install fiftyone
+pip install plantcv #jupyterlab ipympl
 sudo apt install -y ffmpeg
 
 
