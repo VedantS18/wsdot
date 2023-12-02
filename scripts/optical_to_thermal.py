@@ -12,12 +12,12 @@ from plantcv import plantcv as pcv
 
 def main():
 
-    coco_annotation_file_path = "/home/eqwis/projects/datasets/annotations/instances_train2017.json"
-    coco_images_file_path = "/home/eqwis/projects/datasets/train2017/"
-    coco_output_folder = "/home/eqwis/projects/plantcv/thermal/"
+    coco_annotation_file_path = "/home/vedant/Projects/datasets/coco/annotations_trainval2017/annotations/instances_val2017.json"
+    coco_images_file_path = "/home/vedant/Projects/datasets/coco/val2017/"
+    coco_output_folder = "/home/vedant/Projects/datasets/coco/val/"
 
     #Interested in 'person', 'bird', 'cat', 'dog', 'horse', 'sheep', 'cow', 'elephant', 'bear', 'zebra', 'giraffe'
-    coco_interest_category_ids = [1,16,17,18,19,20,21,22,23,24,25]
+    coco_interest_category_ids = [1,15,16,17,18,19,20,21,22,23,24,78]
 
     #Load all annotations
     coco_annotation = COCO(annotation_file=coco_annotation_file_path)
@@ -85,11 +85,11 @@ def main():
                         vertices.append([x,y])
 
                     # Make a custom polygon ROI
-                    roi_contour, roi_hierarchy = pcv.roi.custom(img=pcv_img, vertices=vertices)
+                    roi_contour = pcv.roi.custom(img=pcv_img, vertices=vertices)
                     if mask is None:
-                        mask = pcv.roi.roi2mask(img=pcv_img, contour=roi_contour)
+                        mask = pcv.roi.roi2mask(pcv_img, roi_contour)
                     else:
-                        mask = pcv.logical_or(mask, pcv.roi.roi2mask(img=pcv_img, contour=roi_contour))
+                        mask = pcv.logical_or(mask, pcv.roi.roi2mask(pcv_img, roi_contour))
 
             #pcv.params.debug = "print"
             # Use the final mask and the grayscale image to generate thermal equivalent
