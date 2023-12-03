@@ -1,4 +1,5 @@
 import numpy as np
+import os
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
@@ -12,9 +13,12 @@ from plantcv import plantcv as pcv
 
 def main():
 
-    coco_annotation_file_path = "/home/vedant/Projects/datasets/coco/annotations_trainval2017/annotations/instances_val2017.json"
-    coco_images_file_path = "/home/vedant/Projects/datasets/coco/val2017/"
-    coco_output_folder = "/home/vedant/Projects/datasets/coco/val/"
+    coco_annotation_file_path = "/home/eqwis/projects/wsdot/sandbox/datasets/coco128/train/_annotations.coco.json"
+    coco_images_file_path = "/home/eqwis/projects/wsdot/sandbox/datasets/coco128/train/"
+    coco_output_folder = "/home/eqwis/projects/wsdot/sandbox/datasets/coco128/train_thermal/"
+    #Create output directory if unavailable
+    if (os.path.isdir(coco_output_folder) == False):
+            os.mkdir(coco_output_folder)
 
     #Interested in 'person', 'bird', 'cat', 'dog', 'horse', 'sheep', 'cow', 'elephant', 'bear', 'zebra', 'giraffe'
     coco_interest_category_ids = [1,15,16,17,18,19,20,21,22,23,24,78]
@@ -49,8 +53,8 @@ def main():
             img_info = coco_annotation.loadImgs([img_id])[0]
             img_file_name = img_info["file_name"]
             img_file_path = coco_images_file_path + img_file_name
-
-            img_url = img_info["coco_url"]
+            out_file_path = coco_output_folder + img_file_name
+            #img_url = img_info["coco_url"]
             print(
                 f"Image ID: {img_id}, File Name: {img_file_name}, Image Path: {img_file_path}"
             )
@@ -78,11 +82,14 @@ def main():
                 #If not of interest skip this annotation.
                 if (ann["category_id"] in coco_interest_category_ids):
                     #print(f"Annotation: {ann}")
-                    seg = ann["segmentation"][0]
-                    #Convert into tuple array for PCV segmentation
-                    vertices = []
-                    for x, y in zip(seg[::2],seg[1::2]):  # No need to end at -1 because that's the default
-                        vertices.append([x,y])
+                    print("ann:")
+                    print(ann)
+                    if(len(ann["segmentation"]) > 0):
+                        seg = ann["segmentation"][0]
+                        #Convert into tuple array for PCV segmentation
+                        vertices = []
+                        for x, y in zip(seg[::2],seg[1::2]):  # No need to end at -1 because that's the default
+                            vertices.append([x,y])
 
                     # Make a custom polygon ROI
                     roi_contour = pcv.roi.custom(img=pcv_img, vertices=vertices)
@@ -97,10 +104,10 @@ def main():
             inverted_image = pcv.invert(pcv_grayscale_img)
             background_img = pcv.apply_mask(img=inverted_image, mask=inverted_mask, mask_color='white')
             thermal_image = pcv.gaussian_blur(img=background_img, ksize=(9, 9), sigma_x=0, sigma_y=None)
-            thermal_filename = coco_output_folder + str(img_id) + "_thermal.jpg"
-            print(thermal_filename)
-            pcv.print_image(thermal_image, thermal_filename)
-            pcv.print_image(pcv_img, f"{coco_output_folder}{img_id}_optical.jpg")
+            #thermal_filename = coco_output_folder + str(img_id) + "_thermal.jpg"
+            print(out_file_path)
+            pcv.print_image(thermal_image, out_file_path)
+            #pcv.print_image(pcv_img, f"{coco_output_folder}{img_id}_optical.jpg")
         # Pick images one by one.
     #end for cat_name in cat_names
     return
