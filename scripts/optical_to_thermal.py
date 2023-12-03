@@ -21,7 +21,7 @@ def main():
             os.mkdir(coco_output_folder)
 
     #Interested in 'person', 'bird', 'cat', 'dog', 'horse', 'sheep', 'cow', 'elephant', 'bear', 'zebra', 'giraffe'
-    coco_interest_category_ids = [1,16,17,18,19,20,21,22,23,24,25]
+    coco_interest_category_ids = [1,15,16,17,18,19,20,21,22,23,24,78]
 
     #Load all annotations
     coco_annotation = COCO(annotation_file=coco_annotation_file_path)
@@ -91,12 +91,12 @@ def main():
                         for x, y in zip(seg[::2],seg[1::2]):  # No need to end at -1 because that's the default
                             vertices.append([x,y])
 
-                        # Make a custom polygon ROI
-                        roi_contour, roi_hierarchy = pcv.roi.custom(img=pcv_img, vertices=vertices)
-                        if mask is None:
-                            mask = pcv.roi.roi2mask(img=pcv_img, contour=roi_contour)
-                        else:
-                            mask = pcv.logical_or(mask, pcv.roi.roi2mask(img=pcv_img, contour=roi_contour))
+                    # Make a custom polygon ROI
+                    roi_contour = pcv.roi.custom(img=pcv_img, vertices=vertices)
+                    if mask is None:
+                        mask = pcv.roi.roi2mask(pcv_img, roi_contour)
+                    else:
+                        mask = pcv.logical_or(mask, pcv.roi.roi2mask(pcv_img, roi_contour))
 
             #pcv.params.debug = "print"
             # Use the final mask and the grayscale image to generate thermal equivalent
